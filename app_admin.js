@@ -1,10 +1,5 @@
-// =======================
-// ✅ app_admin.js (FINAL FULL VERSION)
-// =======================
-
 window.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
 
-// ✅ ตรวจสอบสิทธิ์ + แสดงชื่อจริง
 (function initAuth() {
   const role = localStorage.getItem("role");
   const username = localStorage.getItem("username");
@@ -31,7 +26,6 @@ window.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
     });
 })();
 
-// ---------- Global State ----------
 let allTasks = [];
 let viewTasks = [];
 let chart;
@@ -41,13 +35,12 @@ let page = 1;
 let pageSize = 10;
 let selectedIds = new Set();
 
-// ---------- Helpers ----------
 const fmt = {
   date: (s) => {
     if (!s) return "";
     const d = new Date(s);
-    if (isNaN(d)) return s; // ถ้าไม่ใช่วันที่จริง ให้แสดงค่าดิบ
-    const year = d.getFullYear() + 543; // ✅ แปลงเป็นพุทธศักราช
+    if (isNaN(d)) return s;
+    const year = d.getFullYear() + 543;
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return `${day}/${month}/${year}`;
@@ -69,7 +62,7 @@ async function loadTasks() {
       id: t.id,
       taskCode: t.task_id ?? "",
       name: t.task_name ?? t.name,
-      assignee: t.assignee_display || t.assignee || "", // ✅ ใช้ชื่อจริงถ้ามี
+      assignee: t.assignee_display || t.assignee || "",
       startDate: t.start_date ?? t.startDate ?? "",
       endDate: t.end_date ?? t.endDate ?? "",
       progress: Number(t.progress ?? 0),
@@ -143,7 +136,6 @@ function renderTable() {
   rows.forEach((t) => {
     const tr = document.createElement("tr");
 
-    // ✅ Checkbox เลือกรายการ
     const tdSel = document.createElement("td");
     const chk = document.createElement("input");
     chk.type = "checkbox";
@@ -155,10 +147,8 @@ function renderTable() {
     tdSel.appendChild(chk);
     tr.appendChild(tdSel);
 
-    // ✅ แสดง task_id (เช่น T001) ถ้ามี ไม่ใช้ id ตัวเลข
     const taskCode = t.taskCode || t.task_id || `#${t.id}`;
 
-    // ✅ HTML ตาราง
     tr.innerHTML += `
       <td>${escapeHtml(taskCode)}</td>
       <td>${escapeHtml(t.name ?? "")}</td>
@@ -180,19 +170,16 @@ function renderTable() {
       </td>
     `;
 
-    // ✅ ปุ่มแก้ไข / ลบ
     tr.querySelector('[data-act="edit"]').addEventListener("click", () =>
       openEdit(t)
     );
-    tr.querySelector('[data-act="del"]').addEventListener(
-      "click",
-      () => delOne(t.id) // ใช้ id ตัวเลขจริง
+    tr.querySelector('[data-act="del"]').addEventListener("click", () =>
+      delOne(t.id)
     );
 
     tbody.appendChild(tr);
   });
 
-  // ✅ อัปเดต checkbox รวม
   document.getElementById("chkAll").checked = isPageAllChecked();
 }
 
@@ -203,7 +190,6 @@ function renderPager() {
   document.getElementById("pageInfo").textContent = `หน้า ${page}/${maxPage}`;
 }
 
-// ---------- Filter/Search/Sort ----------
 function applyFilterSort() {
   const q = document.getElementById("q").value.trim().toLowerCase();
   const fAssignee =
@@ -230,7 +216,6 @@ function applyFilterSort() {
   });
 }
 
-// ---------- Filter/Search/Sort ----------
 function bindFilterBar() {
   document.getElementById("filterForm").addEventListener("submit", (e) => {
     e.preventDefault();
@@ -290,7 +275,6 @@ function bindFilterBar() {
   document.getElementById("btnExportCSV")?.addEventListener("click", exportCSV);
 }
 
-// ✅ เวอร์ชันใหม่ แสดง display_name ในฟอร์มแก้ไข
 function openEdit(t) {
   document.getElementById("modalTitle").textContent = "✏️ แก้ไขงาน";
   document.getElementById("taskId").value = t.id ?? "";
@@ -318,7 +302,6 @@ document
     document.getElementById("taskModal").close()
   );
 
-// ✅ ฟังก์ชันเรียก API เพิ่ม/ลบ/แก้ไข ใช้ API_BASE ทุกจุด
 async function addTask(payload) {
   const res = await fetch(`${API_BASE}/tasks`, {
     method: "POST",
@@ -357,7 +340,6 @@ document.getElementById("taskForm")?.addEventListener("submit", async (e) => {
     status: document.getElementById("status").value,
     remark: document.getElementById("remark").value.trim(),
 
-    // ✅ เพิ่ม timestamp ทุกครั้งที่มีการบันทึก
     last_update: new Date().toLocaleString("th-TH"),
   };
 
@@ -386,7 +368,6 @@ document.getElementById("taskForm")?.addEventListener("submit", async (e) => {
   }
 });
 
-// ---------- Delete ----------
 async function delOne(id) {
   if (!confirm(`ยืนยันลบงานรหัส: ${id}?`)) return;
   try {
@@ -418,7 +399,6 @@ async function delBulk() {
   }
 }
 
-// ---------- Export CSV ----------
 function exportCSV() {
   const cols = [
     "id",
@@ -445,7 +425,6 @@ function csvCell(v) {
   return `"${s}"`;
 }
 
-// ---------- Utilities ----------
 function escapeHtml(s) {
   return (s || "").replace(
     /[&<>"']/g,
@@ -461,7 +440,6 @@ function isPageAllChecked() {
   return rows.length > 0 && rows.every((r) => selectedIds.has(r.id));
 }
 
-// ---------- เพิ่มงานใหม่ (Collapse Mode) ----------
 const collapseEl = document.getElementById("addTaskCollapse");
 const btnAddTask = document.getElementById("btnAddTask");
 const btnCancelAdd = document.getElementById("btnCancelAdd");
@@ -507,7 +485,7 @@ document
   ?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const payload = {
-      task_id: document.getElementById("newTaskCode").value.trim(), // ✅ เพิ่มตรงนี้
+      task_id: document.getElementById("newTaskCode").value.trim(),
       name: document.getElementById("newTaskName").value.trim(),
       assignee: document.getElementById("newAssignee").value.trim(),
       startDate: document.getElementById("newStartDate").value,
@@ -537,13 +515,11 @@ document
     }
   });
 
-// ---------- Auto Resize Textarea ----------
 function autoResize(el) {
   el.style.height = "auto";
   el.style.height = el.scrollHeight + "px";
 }
 
-// ---------- Boot ----------
 window.addEventListener("DOMContentLoaded", async () => {
   bindFilterBar();
   await loadTasks();

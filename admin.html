@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
-    <!-- =============== TOP BAR =============== -->
     <header class="topbar">
       <div class="left">
         <h1>🛠️ Admin Dashboard</h1>
@@ -23,7 +22,6 @@
       </div>
     </header>
 
-    <!-- =============== SUMMARY + CHART =============== -->
     <section class="wrap">
       <div class="summary-grid">
         <div class="card">
@@ -44,18 +42,12 @@
       </div>
     </section>
 
-    <!-- =============== FILTER BAR =============== -->
     <section class="card" style="grid-column: 1/-1">
       <h2>ตัวกรองข้อมูล</h2>
 
-      <!-- ปุ่มด้านบน (เพิ่มงานใหม่ + ตั้งค่า + ออกจากระบบ) -->
       <div class="admin-top-buttons">
-        <!-- ✅ ปุ่มเพิ่มงานใหม่ -->
-        <!-- ปุ่ม -->
-        <!-- ปุ่มหลัก -->
         <button id="btnAddTask" class="btn primary">➕ เพิ่มงานใหม่</button>
 
-        <!-- ฟอร์มเพิ่มงานใหม่ -->
         <div id="addTaskCollapse" style="display: none">
           <form id="addTaskForm">
             <div>
@@ -113,7 +105,6 @@
         </div>
       </div>
 
-      <!-- ฟอร์มตัวกรอง -->
       <form id="filterForm" class="filter-row">
         <div class="form-group">
           <label>คำค้นหา</label>
@@ -139,7 +130,6 @@
       </form>
     </section>
 
-    <!-- =============== TABLE =============== -->
     <section class="wrap">
       <div class="card">
         <div class="table-wrap">
@@ -181,7 +171,6 @@
       </div>
     </section>
 
-    <!-- =============== MODAL: ADD/EDIT =============== -->
     <dialog id="taskModal" class="modal">
       <form id="taskForm" method="dialog">
         <h3 id="modalTitle">เพิ่มงาน</h3>

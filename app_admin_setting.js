@@ -1,6 +1,3 @@
-// ==============================
-// ✅ app_admin_setting.js (FULL)
-// ==============================
 const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
 
 (function initAuth() {
@@ -45,7 +42,6 @@ async function loadUsers(q = "") {
       </td>
     `;
 
-    // ✅ บันทึก role
     tr.querySelector('[data-act="saveRole"]').addEventListener(
       "click",
       async () => {
@@ -63,7 +59,6 @@ async function loadUsers(q = "") {
       }
     );
 
-    // ✅ รีเซ็ตรหัสผ่าน
     tr.querySelector('[data-act="resetPass"]').addEventListener(
       "click",
       async () => {
@@ -86,7 +81,6 @@ async function loadUsers(q = "") {
   });
 }
 
-// ✅ ค้นหา/รีเฟรช
 document
   .getElementById("refreshUsers")
   .addEventListener("click", () =>
@@ -96,7 +90,6 @@ document.getElementById("uSearch").addEventListener("keydown", (e) => {
   if (e.key === "Enter") loadUsers(e.target.value.trim());
 });
 
-// ✅ บันทึกค่าตั้งต้นระบบ
 document.getElementById("sysForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const body = {

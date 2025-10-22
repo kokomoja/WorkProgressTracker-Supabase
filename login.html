@@ -34,9 +34,7 @@
       <p id="loginMessage"></p>
     </div>
 
-    <!-- ✅ สคริปต์หลัก -->
     <script>
-      // อ่านค่า API จาก public.config.js
       const API_BASE =
         (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
 
@@ -54,7 +52,6 @@
           msg.textContent = "";
 
           try {
-            // ✅ ใช้ backtick แทน "" เพื่อให้แทนค่าตัวแปรได้
             const res = await fetch(`${API_BASE}/login`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -64,7 +61,6 @@
             const data = await res.json();
 
             if (data.status === "success") {
-              // ✅ เก็บ token / role / display name
               localStorage.setItem("token", data.token);
               localStorage.setItem("username", data.username);
               localStorage.setItem("role", data.role);
@@ -76,7 +72,6 @@
               msg.style.color = "#00b050";
               msg.textContent = "✅ เข้าสู่ระบบสำเร็จ!";
 
-              // ✅ Redirect ตามสิทธิ์
               setTimeout(() => {
                 if (data.role === "admin") location.href = "admin.html";
                 else location.href = "user.html";

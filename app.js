@@ -1,11 +1,6 @@
-// =======================
-// ✅ app.js (FULL)
-// =======================
-
 let tasks = [];
 let chart;
 
-// โหลดข้อมูลจากฐาน
 async function loadTasksFromDB() {
   try {
     const token = localStorage.getItem("token");
@@ -32,7 +27,6 @@ async function loadTasksFromDB() {
   }
 }
 
-// เมื่อบันทึกฟอร์ม
 document.getElementById("updateForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -66,7 +60,6 @@ document.getElementById("updateForm").addEventListener("submit", async (e) => {
   document.getElementById("updateForm").reset();
 });
 
-// Render Dashboard
 function renderDashboard() {
   const dashboard = document.getElementById("dashboard");
   if (!Array.isArray(tasks) || tasks.length === 0) {
@@ -131,7 +124,6 @@ function renderDashboard() {
   `;
 }
 
-// อัปเดต Chart
 function updateChart(summary) {
   const ctx = document.getElementById("statusChart").getContext("2d");
   const data = [
@@ -160,9 +152,6 @@ function updateChart(summary) {
   });
 }
 
-// =========================
-// AUTO RESIZE TEXTAREA
-// =========================
 function initAutoResizeTextareas() {
   const textareas = document.querySelectorAll("textarea, textarea.remark");
   textareas.forEach((txt) => {

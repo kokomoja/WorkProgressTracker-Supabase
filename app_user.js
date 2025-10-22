@@ -1,9 +1,3 @@
-// =======================
-// ✅ app_user.js (FULL - Collapse Version)
-// =======================
-
-// ✅ ตรวจสอบสิทธิ์ + แสดงชื่อจริง (ฝั่งผู้ใช้งาน)
-
 window.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
 
 (function initAuth() {
@@ -32,8 +26,6 @@ window.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
     });
 })();
 
-// ตรวจสิทธิ์ผู้ใช้
-
 (function () {
   const role = localStorage.getItem("role");
   const username = localStorage.getItem("username");
@@ -55,7 +47,6 @@ async function loadUserTasks() {
   );
   const data = await res.json();
 
-  // ✅ ใช้ตัวกรองก่อนแสดง
   const finalList = applySortFilterSearch(data);
   renderUserCards(finalList);
   initAutoResizeTextareas();
@@ -74,7 +65,6 @@ function getStatusClass(status) {
   }
 }
 
-// แสดงการ์ดงานแบบพับ/ขยาย
 function renderUserCards(list) {
   const container = document.getElementById("taskList");
   if (!Array.isArray(list) || !list.length) {
@@ -123,23 +113,19 @@ function renderUserCards(list) {
     )
     .join("");
 
-  // 🎯 toggle collapse แบบเปิดได้ทีละการ์ด
   document.querySelectorAll(".task-header").forEach((header, index) => {
     header.addEventListener("click", () => {
       const currentBody = document.getElementById(`body-${index}`);
       const allBodies = document.querySelectorAll(".task-body");
 
-      // ปิดทุกการ์ดก่อน
       allBodies.forEach((body) => {
         if (body !== currentBody) body.classList.remove("active");
       });
 
-      // toggle เฉพาะการ์ดที่คลิก
       currentBody.classList.toggle("active");
     });
   });
 
-  // ✅ ปุ่มอัปเดต
   container.querySelectorAll(".btn-update").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const card = e.target.closest(".task-card");
@@ -179,7 +165,6 @@ function renderUserCards(list) {
     });
   });
 
-  // 🗑️ ปุ่มลบ
   container.querySelectorAll(".btn-del").forEach((btn) => {
     btn.addEventListener("click", async (e) => {
       const card = e.target.closest(".task-card");
@@ -190,24 +175,23 @@ function renderUserCards(list) {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      await loadUserTasks(); // ✅ โหลดใหม่หลังลบ
+      await loadUserTasks();
     });
   });
 }
 
-// เพิ่มงานใหม่
 document.getElementById("userForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const username = localStorage.getItem("username");
-  const displayName = localStorage.getItem("displayName") || username; // ✅ เพิ่มบรรทัดนี้
+  const displayName = localStorage.getItem("displayName") || username;
   const token = localStorage.getItem("token");
 
   const payload = {
     task_id: document.getElementById("taskId").value.trim(),
     name: document.getElementById("taskName").value.trim(),
     assignee: username,
-    assignee_display: displayName, // ✅ ส่งไป server
+    assignee_display: displayName,
     startDate: document.getElementById("startDate").value || null,
     endDate: document.getElementById("endDate").value || null,
     progress: parseInt(document.getElementById("progress").value || "0", 10),
@@ -234,7 +218,6 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   }
 });
 
-// ✅ ผูก Event Re-render ทันทีเมื่อเปลี่ยน filter / sort / search
 ["sortSelect", "filterStatus", "searchBox"].forEach((id) => {
   const el = document.getElementById(id);
   if (el) {
@@ -243,9 +226,6 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   }
 });
 
-// =========================
-// AUTO RESIZE TEXTAREA
-// =========================
 function initAutoResizeTextareas() {
   const textareas = document.querySelectorAll("textarea, textarea.remark");
   textareas.forEach((txt) => {
@@ -259,13 +239,10 @@ function initAutoResizeTextareas() {
 }
 
 window.addEventListener("DOMContentLoaded", async () => {
-  await loadUserTasks(); // โหลดงาน
-  initAutoResizeTextareas(); // ✅ เพิ่มบรรทัดนี้
+  await loadUserTasks();
+  initAutoResizeTextareas();
 });
 
-// =========================
-// 🔍 ฟังก์ชัน Sort + Filter + Search
-// =========================
 function applySortFilterSearch(list) {
   const sortValue = document.getElementById("sortSelect")?.value || "latest";
   const filterValue = document.getElementById("filterStatus")?.value || "";

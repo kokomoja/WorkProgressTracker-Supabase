@@ -14,7 +14,6 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ---------- SQL CONFIG ----------
 require("dotenv").config();
 
 const config = {
@@ -29,7 +28,6 @@ const config = {
 const CONFIRM_SECRET = process.env.CONFIRM_SECRET;
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// ---------- JWT Middleware ----------
 function verifyToken(req, res, next) {
   const token = req.headers["authorization"];
   if (!token)
@@ -44,7 +42,6 @@ function verifyToken(req, res, next) {
   });
 }
 
-// --- Register ---
 app.post("/api/register", async (req, res) => {
   const { username, password, display_name, role, secret } = req.body;
 
@@ -56,7 +53,6 @@ app.post("/api/register", async (req, res) => {
   try {
     const pool = await sql.connect(config);
 
-    // ตรวจสอบซ้ำชื่อผู้ใช้
     const dup = await pool
       .request()
       .input("username", sql.NVarChar, username)
@@ -66,7 +62,6 @@ app.post("/api/register", async (req, res) => {
         .status(400)
         .json({ status: "error", message: "ชื่อผู้ใช้นี้ถูกใช้แล้ว" });
 
-    // ✅ เพิ่มฟิลด์ display_name
     const roleFinal = role === "admin" ? "admin" : "user";
     await pool
       .request()
@@ -88,7 +83,6 @@ app.post("/api/register", async (req, res) => {
   }
 });
 
-// --- Login ---
 app.post("/api/login", async (req, res) => {
   const { username, password } = req.body;
   try {
@@ -119,11 +113,10 @@ app.post("/api/login", async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    // ✅ ต้องมีบรรทัดนี้
     res.json({
       status: "success",
       username: user.username,
-      display_name: user.display_name, // ← ต้องส่งค่านี้กลับมาด้วย
+      display_name: user.display_name,
       role: user.role,
       token,
     });
@@ -140,8 +133,8 @@ app.get("/api/tasks", verifyToken, async (req, res) => {
         t.id,
         t.task_id,
         t.task_name,
-        t.assignee,                             -- username (ยังเก็บไว้)
-        u.display_name AS assignee_display,     -- ✅ ดึงชื่อจริงจาก Users
+        t.assignee,                             
+        u.display_name AS assignee_display,     
         t.start_date,
         t.end_date,
         t.progress,
@@ -159,7 +152,6 @@ app.get("/api/tasks", verifyToken, async (req, res) => {
   }
 });
 
-// ---------- เพิ่มงาน ----------
 app.post("/api/tasks", verifyToken, async (req, res) => {
   const t = req.body;
   try {
@@ -169,7 +161,7 @@ app.post("/api/tasks", verifyToken, async (req, res) => {
       .input("task_id", sql.NVarChar, t.task_id)
       .input("task_name", sql.NVarChar, t.name)
       .input("assignee", sql.NVarChar, t.assignee)
-      .input("assignee_display", sql.NVarChar, t.assignee_display) // ✅ เพิ่มตรงนี้
+      .input("assignee_display", sql.NVarChar, t.assignee_display)
       .input("start_date", sql.Date, t.startDate || null)
       .input("end_date", sql.Date, t.endDate || null)
       .input("progress", sql.Int, t.progress)
@@ -189,7 +181,6 @@ app.post("/api/tasks", verifyToken, async (req, res) => {
   }
 });
 
-// ---------- อัปเดตงาน ----------
 app.put("/api/tasks/:id", verifyToken, async (req, res) => {
   const id = req.params.id;
   const t = req.body;
@@ -197,7 +188,6 @@ app.put("/api/tasks/:id", verifyToken, async (req, res) => {
   try {
     const pool = await sql.connect(config);
 
-    // ✅ ดึงข้อมูลเดิม
     const oldData = await pool
       .request()
       .input("id", sql.Int, id)
@@ -209,8 +199,6 @@ app.put("/api/tasks/:id", verifyToken, async (req, res) => {
         .json({ status: "error", message: "ไม่พบข้อมูลงาน" });
 
     const prev = oldData.recordset[0];
-
-    // ✅ ใช้ค่าเดิม ถ้าไม่ได้ส่งหรือส่ง null/undefined มา
     const task_name =
       t.task_name !== null && t.task_name !== undefined && t.task_name !== ""
         ? t.task_name
@@ -260,7 +248,6 @@ app.put("/api/tasks/:id", verifyToken, async (req, res) => {
   }
 });
 
-// ---------- ลบงาน ----------
 app.delete("/api/tasks/:id", verifyToken, async (req, res) => {
   const { id } = req.params;
   try {
@@ -275,10 +262,8 @@ app.delete("/api/tasks/:id", verifyToken, async (req, res) => {
   }
 });
 
-// ตัวอย่าง config เก็บในไฟล์
 const CONFIG_PATH = path.join(__dirname, "config.json");
 
-// โหลด config เดิมถ้ามี
 let sysConfig = {};
 if (fs.existsSync(CONFIG_PATH)) {
   sysConfig = JSON.parse(fs.readFileSync(CONFIG_PATH, "utf8"));
@@ -290,7 +275,6 @@ if (fs.existsSync(CONFIG_PATH)) {
   fs.writeFileSync(CONFIG_PATH, JSON.stringify(sysConfig, null, 2));
 }
 
-// Middleware ตรวจ role admin
 function requireAdmin(req, res, next) {
   try {
     if (req.user && req.user.role === "admin") return next();
@@ -300,7 +284,6 @@ function requireAdmin(req, res, next) {
   }
 }
 
-// ✅ โหลดงานของผู้ใช้ตาม username
 app.get("/api/tasks/by-user", verifyToken, async (req, res) => {
   const username = req.query.username;
   try {
@@ -319,9 +302,6 @@ app.get("/api/tasks/by-user", verifyToken, async (req, res) => {
   }
 });
 
-// ============= USERS =============
-
-// GET /api/users?q=
 app.get("/api/users", requireAdmin, async (req, res) => {
   try {
     const q = req.query.q?.toLowerCase() || "";
@@ -334,7 +314,6 @@ app.get("/api/users", requireAdmin, async (req, res) => {
   }
 });
 
-// PUT /api/users/:username/role
 app.put("/api/users/:username/role", requireAdmin, async (req, res) => {
   try {
     const { username } = req.params;
@@ -346,7 +325,6 @@ app.put("/api/users/:username/role", requireAdmin, async (req, res) => {
   }
 });
 
-// POST /api/reset-password
 app.post("/api/reset-password", requireAdmin, async (req, res) => {
   const { username, newPassword, secret } = req.body;
   if (secret !== sysConfig.secret) {
@@ -361,13 +339,10 @@ app.post("/api/reset-password", requireAdmin, async (req, res) => {
   res.json({ status: "success" });
 });
 
-// ============= SETTINGS =============
-// GET /api/admin/settings
 app.get("/api/admin/settings", requireAdmin, (req, res) => {
   res.json(sysConfig);
 });
 
-// PUT /api/admin/settings
 app.put("/api/admin/settings", verifyToken, async (req, res) => {
   if (req.user.role !== "admin")
     return res.status(403).json({ status: "error" });
