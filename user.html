@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>PCG | Work Progress Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="public.config.js"></script>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <div class="logo">PCG Work Tracker</div>
+      </nav>
+      <nav>
+        <div class="nav-right">
+          <div class="user-info">
+            <span id="userInfo" class="user-name"></span>
+            <span id="adminInfo" class="user-name"></span>
+            <button id="logout" class="btn-logout">🚪 ออกจากระบบ</button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="card">
+        <h2>Work Progress</h2>
+        <form id="userForm">
+          <div class="form-group">
+            <label>รหัสงาน</label><input id="taskId" required />
+          </div>
+          <div class="form-group">
+            <label>รายละเอียดงาน</label><input id="taskName" required />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>วันที่เริ่มต้น</label><input type="date" id="startDate" />
+            </div>
+            <div class="form-group">
+              <label>วันที่สิ้นสุด</label><input type="date" id="endDate" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>ความคืบหน้า (%)</label
+            ><input
+              type="number"
+              id="progress"
+              min="0"
+              max="100"
+              value="0"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label>สถานะงาน</label>
+            <select id="status">
+              <option>ยังไม่เริ่ม</option>
+              <option selected>กำลังดำเนินการ</option>
+              <option>เสร็จสิ้น</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>หมายเหตุ</label><textarea id="remark"></textarea>
+          </div>
+          <button type="submit">บันทึกข้อมูล</button>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>My Work</h2>
+
+        <!-- 🔍 ส่วนควบคุม Search + Filter + Sort -->
+        <div class="form-row" style="margin-bottom: 1rem">
+          <div class="form-group" style="flex: 2">
+            <label>ค้นหา:</label>
+            <input
+              id="searchBox"
+              placeholder="🔍 ค้นหารหัสงาน / รายละเอียดงาน"
+            />
+          </div>
+
+          <div class="form-group" style="flex: 1">
+            <label>กรองสถานะ:</label>
+            <select id="filterStatus">
+              <option value="">ทั้งหมด</option>
+              <option>ยังไม่เริ่ม</option>
+              <option>กำลังดำเนินการ</option>
+              <option>เสร็จสิ้น</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="flex: 1">
+            <label>เรียงตาม:</label>
+            <select id="sortSelect">
+              <option value="latest">อัปเดตล่าสุด (ใหม่ → เก่า)</option>
+              <option value="oldest">อัปเดตล่าสุด (เก่า → ใหม่)</option>
+              <option value="progress">ความคืบหน้า (%)</option>
+              <option value="status">สถานะงาน</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="taskList" class="task-list">
+          <p align="center">Loading...</p>
+        </div>
+      </section>
+    </main>
+
+    <footer style="text-align: center">© 2025 PCG Work Tracker</footer>
+
+    <script src="app_user.js"></script>
+  </body>
+</html>

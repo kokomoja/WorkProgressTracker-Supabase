@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Admin | PCG Work Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="public.config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <!-- =============== TOP BAR =============== -->
+    <header class="topbar">
+      <div class="left">
+        <h1>🛠️ Admin Dashboard</h1>
+      </div>
+      <div class="right">
+        <div class="user-info">
+          <span id="adminInfo">👑 admin</span>
+          <a class="btn" href="admin_setting.html">⚙️ ตั้งค่า</a>
+          <button id="logout" class="btn danger">🚪 ออกจากระบบ</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =============== SUMMARY + CHART =============== -->
+    <section class="wrap">
+      <div class="summary-grid">
+        <div class="card">
+          <div class="kpi-label">ยังไม่เริ่ม</div>
+          <div id="kpiTodo" class="kpi-value">0</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">กำลังดำเนินการ</div>
+          <div id="kpiDoing" class="kpi-value">0</div>
+        </div>
+        <div class="card">
+          <div class="kpi-label">เสร็จสิ้น</div>
+          <div id="kpiDone" class="kpi-value">0</div>
+        </div>
+      </div>
+      <div class="card" style="height: 320px">
+        <canvas id="statusChart"></canvas>
+      </div>
+    </section>
+
+    <!-- =============== FILTER BAR =============== -->
+    <section class="card" style="grid-column: 1/-1">
+      <h2>ตัวกรองข้อมูล</h2>
+
+      <!-- ปุ่มด้านบน (เพิ่มงานใหม่ + ตั้งค่า + ออกจากระบบ) -->
+      <div class="admin-top-buttons">
+        <!-- ✅ ปุ่มเพิ่มงานใหม่ -->
+        <!-- ปุ่ม -->
+        <!-- ปุ่มหลัก -->
+        <button id="btnAddTask" class="btn primary">➕ เพิ่มงานใหม่</button>
+
+        <!-- ฟอร์มเพิ่มงานใหม่ -->
+        <div id="addTaskCollapse" style="display: none">
+          <form id="addTaskForm">
+            <div>
+              <label>รหัสงาน (Task ID)</label>
+              <input id="newTaskCode" placeholder="เช่น T001" required />
+            </div>
+            <div>
+              <label>รายละเอียดงาน</label>
+              <input id="newTaskName" required />
+            </div>
+            <div>
+              <label>ผู้รับผิดชอบ</label>
+              <input id="newAssignee" required />
+            </div>
+            <div>
+              <label>วันที่เริ่มต้น</label>
+              <input id="newStartDate" type="date" />
+            </div>
+            <div>
+              <label>วันที่สิ้นสุด</label>
+              <input id="newEndDate" type="date" />
+            </div>
+            <div>
+              <label>ความคืบหน้า (%)</label>
+              <input
+                id="newProgress"
+                type="number"
+                min="0"
+                max="100"
+                value="0"
+              />
+            </div>
+            <div>
+              <label>สถานะ</label>
+              <select id="newStatus">
+                <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+                <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+                <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+              </select>
+            </div>
+            <div style="grid-column: 1/-1">
+              <label>หมายเหตุ</label>
+              <textarea
+                id="newRemark"
+                placeholder="หมายเหตุเพิ่มเติม..."
+              ></textarea>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="btnCancelAdd" class="btn ghost">
+                ยกเลิก
+              </button>
+              <button type="submit" class="btn primary">💾 บันทึก</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- ฟอร์มตัวกรอง -->
+      <form id="filterForm" class="filter-row">
+        <div class="form-group">
+          <label>คำค้นหา</label>
+          <input id="q" placeholder="🔍 รหัสงาน / รายละเอียดงาน" />
+        </div>
+
+        <div class="form-group">
+          <label>ผู้รับผิดชอบ</label>
+          <input id="fAssignee" placeholder="👷 ชื่อผู้รับผิดชอบ" />
+        </div>
+
+        <div class="form-group">
+          <label>สถานะ</label>
+          <select id="fStatus">
+            <option value="">ทั้งหมด</option>
+            <option>ยังไม่เริ่ม</option>
+            <option>กำลังดำเนินการ</option>
+            <option>เสร็จสิ้น</option>
+          </select>
+        </div>
+
+        <button id="btnApply" type="button">🔍 ใช้ตัวกรอง</button>
+      </form>
+    </section>
+
+    <!-- =============== TABLE =============== -->
+    <section class="wrap">
+      <div class="card">
+        <div class="table-wrap">
+          <table id="taskTable">
+            <thead>
+              <tr>
+                <th style="width: 36px">
+                  <input type="checkbox" id="chkAll" />
+                </th>
+                <th data-sort="id">รหัสงาน ⥮</th>
+                <th data-sort="name">รายละเอียดงาน ⥮</th>
+                <th data-sort="assignee">ผู้รับผิดชอบ ⥮</th>
+                <th data-sort="startDate">เริ่ม ⥮</th>
+                <th data-sort="endDate">สิ้นสุด ⥮</th>
+                <th data-sort="progress">ความคืบหน้า ⥮</th>
+                <th data-sort="status">สถานะ ⥮</th>
+                <th>หมายเหตุ</th>
+                <th data-sort="lastUpdate">อัปเดตล่าสุด ⥮</th>
+                <th style="min-width: 120px">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="taskTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="row center gap" style="margin-top: 12px">
+          <button class="btn ghost" id="prevPage">⬅</button>
+          <span id="pageInfo">หน้า 1/1</span>
+          <button class="btn ghost" id="nextPage">➡</button>
+          <div class="flex-spacer"></div>
+          <label>แสดงต่อหน้า:</label>
+          <select id="pageSize" style="width: 90px">
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+            <option>100</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- =============== MODAL: ADD/EDIT =============== -->
+    <dialog id="taskModal" class="modal">
+      <form id="taskForm" method="dialog">
+        <h3 id="modalTitle">เพิ่มงาน</h3>
+        <input type="hidden" id="taskId" />
+        <div class="grid2 gap">
+          <div>
+            <label>รายละเอียดงาน</label>
+            <input id="taskName" required />
+          </div>
+          <div>
+            <label>ผู้รับผิดชอบ</label>
+            <input id="assignee" required />
+          </div>
+          <div>
+            <label>วันที่เริ่มต้น</label>
+            <input id="startDate" type="date" />
+          </div>
+          <div>
+            <label>วันที่สิ้นสุด</label>
+            <input id="endDate" type="date" />
+          </div>
+          <div>
+            <label>ความคืบหน้า (%)</label>
+            <input id="progress" type="number" min="0" max="100" value="0" />
+          </div>
+          <div>
+            <label>สถานะ</label>
+            <select id="status" required>
+              <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+              <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+              <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+            </select>
+          </div>
+          <div class="col-span2">
+            <label>หมายเหตุ</label>
+            <textarea
+              id="remark"
+              class="remark"
+              rows="2"
+              placeholder="รายละเอียดเพิ่มเติม..."
+            ></textarea>
+          </div>
+        </div>
+        <div class="row right gap" style="margin-top: 14px">
+          <button type="button" id="btnCancel" class="btn ghost">ยกเลิก</button>
+          <button type="submit" class="btn primary">บันทึก</button>
+        </div>
+      </form>
+    </dialog>
+    <script>
+      const API_BASE =
+        (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
+    </script>
+    <script src="app_admin.js"></script>
+  </body>
+</html>

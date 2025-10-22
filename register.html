@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>สมัครสมาชิก | PCG Work Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="public.config.js"></script>
+  </head>
+  <body class="auth-page">
+    <div class="auth-container">
+      <h1>🆕 สมัครสมาชิก</h1>
+      <form id="registerForm">
+        <div class="form-group">
+          <label>ชื่อพนักงาน / ชื่อที่แสดงในระบบ</label>
+          <input id="display_name" required />
+        </div>
+
+        <div class="form-group">
+          <label>ชื่อผู้ใช้ (สำหรับล็อกอิน)</label>
+          <input id="username" required />
+        </div>
+
+        <div class="form-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" id="password" required />
+        </div>
+
+        <div class="form-group">
+          <label>สิทธิ์การใช้งาน</label>
+          <select id="role">
+            <option value="user">ผู้ใช้งานทั่วไป</option>
+            <option value="admin">ผู้ดูแลระบบ</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>รหัสยืนยันการสมัคร</label>
+          <input
+            type="password"
+            id="secret"
+            placeholder="0845535000721"
+            required
+          />
+        </div>
+
+        <button type="submit">สมัครสมาชิก</button>
+      </form>
+
+      <p>มีบัญชีแล้ว? <a href="login.html">เข้าสู่ระบบ</a></p>
+      <p id="registerMessage"></p>
+    </div>
+
+    <script>
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            display_name: document.getElementById("display_name").value.trim(),
+            username: document.getElementById("username").value.trim(),
+            password: document.getElementById("password").value.trim(),
+            role: document.getElementById("role").value,
+            secret: document.getElementById("secret").value.trim(),
+          };
+
+          const msg = document.getElementById("registerMessage");
+          msg.textContent = "";
+          try {
+            const API_BASE =
+              (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
+
+            const res = await fetch("${API_BASE}/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+            const data = await res.json();
+
+            if (data.status === "success") {
+              msg.style.color = "#00b050";
+              msg.textContent =
+                "✅ " + data.message + " กำลังนำคุณไปหน้าล็อกอิน...";
+              setTimeout(() => (location.href = "login.html"), 1200);
+            } else {
+              msg.style.color = "#ff3b3b";
+              msg.textContent = "❌ " + data.message;
+            }
+          } catch {
+            msg.style.color = "#ff3b3b";
+            msg.textContent = "❌ ไม่สามารถเชื่อมต่อ API";
+          }
+        });
+    </script>
+  </body>
+</html>

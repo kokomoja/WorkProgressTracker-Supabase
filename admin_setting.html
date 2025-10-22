@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Admin Settings | PCG Work Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="public.config.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="left"><h1>⚙️ ตั้งค่าระบบ (ยังไม่ได้พัฒนา)</h1></div>
+      <div class="right">
+        <a class="btn" href="admin.html">← กลับแดชบอร์ด</a>
+        <button id="logout" class="btn danger">ออกจากระบบ</button>
+      </div>
+    </header>
+
+    <section class="wrap grid2 gap">
+      <!-- ผู้ใช้งาน -->
+      <div class="card">
+        <h3>👤 จัดการผู้ใช้งาน</h3>
+        <div class="row gap">
+          <input id="uSearch" placeholder="ค้นหา username" />
+          <button id="refreshUsers" class="btn">รีเฟรช</button>
+        </div>
+        <div class="table-wrap" style="margin-top: 10px">
+          <table>
+            <thead>
+              <tr>
+                <th>ชื่อผู้ใช้</th>
+                <th>สิทธิ์</th>
+                <th style="min-width: 180px">จัดการ</th>
+              </tr>
+            </thead>
+            <tbody id="userTbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ค่าตั้งต้นระบบ -->
+      <div class="card">
+        <h3>🧩 ค่าตั้งต้นระบบ</h3>
+        <form id="sysForm" class="grid2 gap">
+          <div>
+            <label>Secret สมัคร/รีเซ็ตรหัสผ่าน</label>
+            <input id="cfgSecret" type="password" placeholder="" />
+          </div>
+          <div>
+            <label>สถานะงานที่ใช้บ่อย (คอมมา , คั่น)</label>
+            <input
+              id="cfgStatuses"
+              placeholder="ยังไม่เริ่ม,กำลังดำเนินการ,เสร็จสิ้น"
+            />
+          </div>
+          <div class="col-span2 row right gap">
+            <button type="submit" class="btn primary">บันทึก</button>
+          </div>
+        </form>
+        <small>หมายเหตุ: </small>
+      </div>
+    </section>
+    <script>
+      const API_BASE =
+        (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
+    </script>
+    <script src="app_admin_setting.js"></script>
+  </body>
+</html>

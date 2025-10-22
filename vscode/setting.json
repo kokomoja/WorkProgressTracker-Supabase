@@ -1,0 +1,72 @@
+{
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+
+  "liveServer.settings.donotVerifyTags": true,
+  "liveServer.settings.donotShowInfoMsg": true,
+
+  "mssql.connectionGroups": [
+    {
+      "name": "ROOT",
+      "id": "CF60D61C-17D5-41D0-A61E-B667C48E7558"
+    }
+  ],
+  "mssql.connections": [
+    {
+      "authenticationType": "SqlLogin",
+      "connectTimeout": 30,
+      "applicationName": "vscode-mssql",
+      "applicationIntent": "ReadWrite",
+      "profileName": "HQ",
+      "server": "192.168.99.253,1433",
+      "trustServerCertificate": true,
+      "user": "sa",
+      "password": "",
+      "savePassword": true,
+      "database": "",
+      "groupId": "CF60D61C-17D5-41D0-A61E-B667C48E7558",
+      "id": "8A61B324-6B60-4BEB-84D9-BB961680086B",
+      "commandTimeout": 30,
+      "encrypt": "Mandatory"
+    }
+  ],
+
+  "json.schemas": [],
+
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  "html.format.indentInnerHtml": true,
+  "css.format.enable": true,
+  "javascript.format.enable": true,
+
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+
+  "eslint.enable": true,
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+
+  "editor.linkedEditing": true,
+  "auto-rename-tag.activationOnLanguage": [
+    "html",
+    "xml",
+    "php",
+    "javascript",
+    "vue"
+  ],
+  "auto-close-tag.activationOnLanguage": [
+    "html",
+    "xml",
+    "php",
+    "javascript",
+    "vue"
+  ],
+
+  "html-css-class-completion.enableEmmetSupport": true,
+  "html-css-class-completion.enable": true
+}

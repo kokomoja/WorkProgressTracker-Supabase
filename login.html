@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>เข้าสู่ระบบ | PCG Work Tracker</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="public.config.js"></script>
+  </head>
+
+  <body class="auth-page">
+    <div class="auth-container">
+      <h1>🔐 เข้าสู่ระบบ</h1>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>ชื่อผู้ใช้</label>
+          <input id="username" required />
+        </div>
+
+        <div class="form-group">
+          <label>รหัสผ่าน</label>
+          <input type="password" id="password" required />
+        </div>
+
+        <button type="submit">เข้าสู่ระบบ</button>
+      </form>
+
+      <p>
+        ยังไม่มีบัญชี?
+        <a href="register.html">สมัครสมาชิก</a> |
+        <a href="forgot.html">ลืมรหัสผ่าน</a>
+      </p>
+
+      <p id="loginMessage"></p>
+    </div>
+
+    <!-- ✅ สคริปต์หลัก -->
+    <script>
+      // อ่านค่า API จาก public.config.js
+      const API_BASE =
+        (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
+
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const body = {
+            username: document.getElementById("username").value.trim(),
+            password: document.getElementById("password").value.trim(),
+          };
+
+          const msg = document.getElementById("loginMessage");
+          msg.textContent = "";
+
+          try {
+            // ✅ ใช้ backtick แทน "" เพื่อให้แทนค่าตัวแปรได้
+            const res = await fetch(`${API_BASE}/login`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            });
+
+            const data = await res.json();
+
+            if (data.status === "success") {
+              // ✅ เก็บ token / role / display name
+              localStorage.setItem("token", data.token);
+              localStorage.setItem("username", data.username);
+              localStorage.setItem("role", data.role);
+              localStorage.setItem(
+                "displayName",
+                data.display_name || data.username
+              );
+
+              msg.style.color = "#00b050";
+              msg.textContent = "✅ เข้าสู่ระบบสำเร็จ!";
+
+              // ✅ Redirect ตามสิทธิ์
+              setTimeout(() => {
+                if (data.role === "admin") location.href = "admin.html";
+                else location.href = "user.html";
+              }, 800);
+            } else {
+              msg.style.color = "#ff3b3b";
+              msg.textContent = "❌ " + data.message;
+            }
+          } catch (err) {
+            msg.style.color = "#ff3b3b";
+            msg.textContent = "❌ ไม่สามารถเชื่อมต่อ API";
+            console.error("Login error:", err);
+          }
+        });
+    </script>
+  </body>
+</html>
