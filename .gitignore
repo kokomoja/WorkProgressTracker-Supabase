@@ -5,6 +5,7 @@
 *.pem
 config.json
 server.secure.js
+command.txt
 
 # --- 🧠 Node.js Core ---
 node_modules/
