@@ -22,6 +22,7 @@
       </div>
     </header>
 
+    <!-- 🧩 KPI + Chart -->
     <section class="wrap">
       <div class="summary-grid">
         <div class="card">
@@ -37,17 +38,18 @@
           <div id="kpiDone" class="kpi-value">0</div>
         </div>
       </div>
+
       <div class="card" style="height: 320px">
         <canvas id="statusChart"></canvas>
       </div>
     </section>
 
+    <!-- 🧩 ตัวกรอง + เพิ่มงาน -->
     <section class="card" style="grid-column: 1/-1">
       <h2>ตัวกรองข้อมูล</h2>
 
       <div class="admin-top-buttons">
         <button id="btnAddTask" class="btn primary">➕ เพิ่มงานใหม่</button>
-
         <div id="addTaskCollapse" style="display: none">
           <form id="addTaskForm">
             <div>
@@ -59,8 +61,12 @@
               <input id="newTaskName" required />
             </div>
             <div>
-              <label>ผู้รับผิดชอบ</label>
-              <input id="newAssignee" required />
+              <div>
+                <label>ผู้รับผิดชอบ</label>
+                <select id="newAssignee" required>
+                  <option value="">-- เลือกผู้รับผิดชอบ --</option>
+                </select>
+              </div>
             </div>
             <div>
               <label>วันที่เริ่มต้น</label>
@@ -105,31 +111,21 @@
         </div>
       </div>
 
+      <!-- ✅ Filter Bar -->
       <form id="filterForm" class="filter-row">
-        <div class="form-group">
-          <label>คำค้นหา</label>
-          <input id="q" placeholder="🔍 รหัสงาน / รายละเอียดงาน" />
-        </div>
-
-        <div class="form-group">
-          <label>ผู้รับผิดชอบ</label>
-          <input id="fAssignee" placeholder="👷 ชื่อผู้รับผิดชอบ" />
-        </div>
-
-        <div class="form-group">
-          <label>สถานะ</label>
+        <div class="filter-bar">
+          <label for="fStatus">สถานะ:</label>
           <select id="fStatus">
             <option value="">ทั้งหมด</option>
-            <option>ยังไม่เริ่ม</option>
-            <option>กำลังดำเนินการ</option>
-            <option>เสร็จสิ้น</option>
+            <option value="ยังไม่เริ่ม">ยังไม่เริ่ม</option>
+            <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+            <option value="เสร็จสิ้น">เสร็จสิ้น</option>
           </select>
         </div>
-
-        <button id="btnApply" type="button">🔍 ใช้ตัวกรอง</button>
       </form>
     </section>
 
+    <!-- 🧩 ตารางงาน -->
     <section class="wrap">
       <div class="card">
         <div class="table-wrap">
@@ -171,6 +167,7 @@
       </div>
     </section>
 
+    <!-- 🧩 Modal แก้ไข -->
     <dialog id="taskModal" class="modal">
       <form id="taskForm" method="dialog">
         <h3 id="modalTitle">เพิ่มงาน</h3>
@@ -181,8 +178,12 @@
             <input id="taskName" required />
           </div>
           <div>
-            <label>ผู้รับผิดชอบ</label>
-            <input id="assignee" required />
+            <div>
+              <label>ผู้รับผิดชอบ</label>
+              <select id="editAssignee" required>
+                <option value="">-- เลือกผู้รับผิดชอบ --</option>
+              </select>
+            </div>
           </div>
           <div>
             <label>วันที่เริ่มต้น</label>
@@ -220,6 +221,7 @@
         </div>
       </form>
     </dialog>
+
     <script>
       const API_BASE =
         (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";

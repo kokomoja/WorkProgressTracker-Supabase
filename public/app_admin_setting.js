@@ -47,7 +47,7 @@ async function loadUsers(q = "") {
       async () => {
         const roleSel = tr.querySelector(".roleSel");
         const newRole = roleSel.value;
-        await fetch(
+        const res = await fetch(
           `${API_BASE}/users/${encodeURIComponent(u.username)}/role`,
           {
             method: "PUT",
@@ -55,7 +55,7 @@ async function loadUsers(q = "") {
             body: JSON.stringify({ role: newRole }),
           }
         );
-        alert("✅ อัปเดตสิทธิ์สำเร็จ");
+        if (res.ok) alert("✅ อัปเดตสิทธิ์สำเร็จ");
       }
     );
 

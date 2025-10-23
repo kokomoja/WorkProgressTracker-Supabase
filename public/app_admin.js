@@ -59,16 +59,16 @@ async function loadTasks() {
     const res = await fetch(`${API_BASE}/tasks`, { headers: tokenHeader() });
     const data = await res.json();
     allTasks = (data || []).map((t) => ({
-      id: t.id,
-      taskCode: t.task_id ?? "",
+      id: Number(t.id), // แปลงเป็น number ไว้เปรียบเทียบได้
+      taskCode: t.task_id ?? "", // ✅ ใช้สำหรับแสดงและหา task_id
       name: t.task_name ?? t.name,
       assignee: t.assignee_display || t.assignee || "",
-      startDate: t.start_date ?? t.startDate ?? "",
-      endDate: t.end_date ?? t.endDate ?? "",
+      startDate: t.start_date ?? "",
+      endDate: t.end_date ?? "",
       progress: Number(t.progress ?? 0),
       status: t.status ?? "ยังไม่เริ่ม",
       remark: t.remark ?? "",
-      lastUpdate: t.last_update ?? t.lastUpdate ?? "",
+      lastUpdate: t.last_update ?? "",
     }));
 
     page = 1;
@@ -77,6 +77,40 @@ async function loadTasks() {
   } catch (err) {
     console.error("โหลดงานไม่สำเร็จ:", err);
     alert("❌ โหลดข้อมูลงานไม่สำเร็จ");
+  }
+}
+
+async function loadUserList() {
+  try {
+    const res = await fetch(`${API_BASE}/users`, { headers: tokenHeader() });
+    const data = await res.json();
+
+    // 🧩 1. สำหรับฟอร์มเพิ่มงาน
+    const addSelect = document.getElementById("newAssignee");
+    if (addSelect) {
+      addSelect.innerHTML = '<option value="">-- เลือกผู้รับผิดชอบ --</option>';
+      data.forEach((u) => {
+        const opt = document.createElement("option");
+        opt.value = u.username;
+        opt.textContent = u.display_name || u.username;
+        addSelect.appendChild(opt);
+      });
+    }
+
+    // 🧩 2. สำหรับ modal แก้ไขงาน
+    const editSelect = document.getElementById("editAssignee");
+    if (editSelect) {
+      editSelect.innerHTML =
+        '<option value="">-- เลือกผู้รับผิดชอบ --</option>';
+      data.forEach((u) => {
+        const opt = document.createElement("option");
+        opt.value = u.username;
+        opt.textContent = u.display_name || u.username;
+        editSelect.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error("❌ โหลดรายชื่อผู้ใช้ไม่สำเร็จ:", err);
   }
 }
 
@@ -135,7 +169,6 @@ function renderTable() {
 
   rows.forEach((t) => {
     const tr = document.createElement("tr");
-
     const tdSel = document.createElement("td");
     const chk = document.createElement("input");
     chk.type = "checkbox";
@@ -169,6 +202,7 @@ function renderTable() {
         <button class="btn btn-danger" data-act="del">ลบ</button>
       </td>
     `;
+    tbody.appendChild(tr);
 
     tr.querySelector('[data-act="edit"]').addEventListener("click", () =>
       openEdit(t)
@@ -176,8 +210,6 @@ function renderTable() {
     tr.querySelector('[data-act="del"]').addEventListener("click", () =>
       delOne(t.id)
     );
-
-    tbody.appendChild(tr);
   });
 
   document.getElementById("chkAll").checked = isPageAllChecked();
@@ -191,25 +223,16 @@ function renderPager() {
 }
 
 function applyFilterSort() {
-  const q = document.getElementById("q").value.trim().toLowerCase();
-  const fAssignee =
-    document.getElementById("fAssignee")?.value.trim().toLowerCase() || "";
-  const fStatus = document.getElementById("fStatus").value;
-
+  const statusEl = document.getElementById("fStatus");
+  const fStatus = statusEl ? statusEl.value : "";
   viewTasks = allTasks.filter((t) => {
-    const blob = `${t.name || ""} ${t.assignee || ""} ${
-      t.remark || ""
-    }`.toLowerCase();
-    if (q && !blob.includes(q)) return false;
-    if (fAssignee && !t.assignee.toLowerCase().includes(fAssignee))
-      return false;
     if (fStatus && t.status !== fStatus) return false;
     return true;
   });
 
   viewTasks.sort((a, b) => {
-    const A = a[sortBy] ?? "",
-      B = b[sortBy] ?? "";
+    const A = a[sortBy] ?? "";
+    const B = b[sortBy] ?? "";
     if (A < B) return sortDir === "asc" ? -1 : 1;
     if (A > B) return sortDir === "asc" ? 1 : -1;
     return 0;
@@ -217,41 +240,52 @@ function applyFilterSort() {
 }
 
 function bindFilterBar() {
-  document.getElementById("filterForm").addEventListener("submit", (e) => {
-    e.preventDefault();
+  // 🧩 ให้ข้อมูลเปลี่ยนทันทีเมื่อพิมพ์ หรือเปลี่ยนค่าช่องกรอง
+  const instantFilter = () => {
     page = 1;
     applyFilterSort();
     renderAll();
-  });
+  };
 
-  document.getElementById("btnApply")?.addEventListener("click", () => {
-    page = 1;
-    applyFilterSort();
-    renderAll();
-  });
-
-  document.getElementById("btnResetFilter")?.addEventListener("click", () => {
-    ["q", "fAssignee", "fStatus"].forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) el.value = "";
+  const searchBox = document.getElementById("q");
+  if (searchBox) {
+    let typingTimer;
+    searchBox.addEventListener("input", () => {
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(instantFilter, 300);
     });
-    page = 1;
-    applyFilterSort();
-    renderAll();
-  });
+  }
 
-  document.getElementById("pageSize")?.addEventListener("change", (e) => {
-    pageSize = Number(e.target.value || 10);
-    page = 1;
-    renderAll();
-  });
+  // ช่องกรองผู้รับผิดชอบ
+  const assigneeFilter = document.getElementById("fAssignee");
+  if (assigneeFilter) {
+    assigneeFilter.addEventListener("input", instantFilter);
+  }
 
+  // ช่องกรองสถานะ
+  const statusFilter = document.getElementById("fStatus");
+  if (statusFilter) {
+    statusFilter.addEventListener("change", instantFilter);
+  }
+
+  // ✅ การเปลี่ยน pageSize (ต่อหน้า)
+  const pageSizeSelect = document.getElementById("pageSize");
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener("change", () => {
+      pageSize = Number(pageSizeSelect.value || 10);
+      page = 1;
+      renderAll();
+    });
+  }
+
+  // ✅ ปุ่มเปลี่ยนหน้า (ยังคงไว้)
   document.getElementById("prevPage")?.addEventListener("click", () => {
     if (page > 1) {
       page--;
       renderAll();
     }
   });
+
   document.getElementById("nextPage")?.addEventListener("click", () => {
     const maxPage = Math.max(1, Math.ceil(viewTasks.length / pageSize));
     if (page < maxPage) {
@@ -260,6 +294,7 @@ function bindFilterBar() {
     }
   });
 
+  // ✅ sort column header (ยังคงไว้เหมือนเดิม)
   document.querySelectorAll("#taskTable thead th[data-sort]").forEach((th) => {
     th.style.cursor = "pointer";
     th.addEventListener("click", () => {
@@ -270,37 +305,48 @@ function bindFilterBar() {
       renderAll();
     });
   });
-
-  document.getElementById("btnBulkDelete")?.addEventListener("click", delBulk);
-  document.getElementById("btnExportCSV")?.addEventListener("click", exportCSV);
 }
 
 function openEdit(t) {
-  document.getElementById("modalTitle").textContent = "✏️ แก้ไขงาน";
-  document.getElementById("taskId").value = t.id ?? "";
-  document.getElementById("taskName").value = t.name ?? "";
-  const assigneeName = t.assignee_display || t.assignee || "";
-  document.getElementById("assignee").value = assigneeName;
-  document.getElementById("startDate").value = t.startDate ?? "";
-  document.getElementById("endDate").value = t.endDate ?? "";
-  document.getElementById("progress").value = t.progress ?? 0;
-  document.getElementById("status").value = t.status ?? "ยังไม่เริ่ม";
-  document.getElementById("remark").value = t.remark ?? "";
-  document.getElementById("taskModal").showModal();
+  try {
+    const modal = document.getElementById("taskModal");
+    if (!modal) throw new Error("❌ ไม่พบ element #taskModal");
 
-  const startDateEl = document.getElementById("startDate");
-  const endDateEl = document.getElementById("endDate");
-  if (startDateEl && endDateEl) {
-    startDateEl.disabled = true;
-    endDateEl.disabled = true;
+    document.getElementById("modalTitle").textContent = "✏️ แก้ไขงาน";
+    document.getElementById("taskId").value = t.id ?? "";
+    document.getElementById("taskName").value = t.name ?? t.task_name ?? "";
+    const assigneeSelect = document.getElementById("editAssignee");
+    if (assigneeSelect) assigneeSelect.value = t.assignee || "";
+    document.getElementById("startDate").value =
+      t.startDate ?? t.start_date ?? "";
+    document.getElementById("endDate").value = t.endDate ?? t.end_date ?? "";
+    document.getElementById("progress").value = t.progress ?? 0;
+    document.getElementById("status").value = t.status ?? "ยังไม่เริ่ม";
+    document.getElementById("remark").value = t.remark ?? "";
+
+    if (modal.showModal) modal.showModal();
+    else modal.style.display = "block";
+
+    const startDateEl = document.getElementById("startDate");
+    const endDateEl = document.getElementById("endDate");
+    if (startDateEl && endDateEl) {
+      startDateEl.disabled = false;
+      endDateEl.disabled = false;
+    }
+  } catch (err) {
+    console.error("❌ openEdit error:", err);
+    alert(
+      "ไม่สามารถเปิดหน้าต่างแก้ไขงานได้ กรุณาตรวจสอบ element ID ให้ตรงกับฟอร์ม"
+    );
   }
 }
 
-document
-  .getElementById("btnCancel")
-  ?.addEventListener("click", () =>
-    document.getElementById("taskModal").close()
-  );
+// ปุ่มยกเลิก
+document.getElementById("btnCancel")?.addEventListener("click", () => {
+  const modal = document.getElementById("taskModal");
+  if (modal?.close) modal.close();
+  else modal.style.display = "none";
+});
 
 async function addTask(payload) {
   const res = await fetch(`${API_BASE}/tasks`, {
@@ -330,19 +376,23 @@ async function deleteTask(id) {
 
 document.getElementById("taskForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const assigneeSelect = document.getElementById("editAssignee");
+  const assigneeDisplay =
+    assigneeSelect.options[assigneeSelect.selectedIndex]?.textContent?.trim() ||
+    assigneeSelect.value.trim();
+
   const payload = {
     id: document.getElementById("taskId").value || undefined,
     name: document.getElementById("taskName").value.trim(),
-    assignee: document.getElementById("assignee").value.trim(),
+    assignee: assigneeDisplay,
     startDate: document.getElementById("startDate").value,
     endDate: document.getElementById("endDate").value,
     progress: Number(document.getElementById("progress").value || 0),
     status: document.getElementById("status").value,
     remark: document.getElementById("remark").value.trim(),
-
     last_update: new Date().toLocaleString("th-TH"),
   };
-
   if (!payload.name || !payload.assignee) {
     alert("กรอก 'รายละเอียดงาน' และ 'ผู้รับผิดชอบ' ให้ครบ");
     return;
@@ -360,27 +410,50 @@ document.getElementById("taskForm")?.addEventListener("submit", async (e) => {
       body: JSON.stringify(payload),
     });
 
-    document.getElementById("taskModal").close();
+    const modal = document.getElementById("taskModal");
+    if (modal?.close) modal.close();
+    else modal.style.display = "none";
     await loadTasks();
   } catch (err) {
     console.error("บันทึกงานล้มเหลว:", err);
     alert("❌ ไม่สามารถเชื่อมต่อ API ได้");
   }
 });
+// ✅ คลิกนอก modal เพื่อปิด
+window.addEventListener("click", (event) => {
+  const modal = document.getElementById("taskModal");
+  if (modal && event.target === modal) {
+    if (modal.close) modal.close();
+    else modal.style.display = "none";
+  }
+});
 
 async function delOne(id) {
-  if (!confirm(`ยืนยันลบงานรหัส: ${id}?`)) return;
   try {
-    await fetch(`${API_BASE}/tasks/${encodeURIComponent(id)}`, {
+    const task = allTasks.find((t) => Number(t.id) === Number(id));
+    const taskCode = task?.taskCode || "(ไม่ทราบรหัส)";
+    const taskName = task?.name || "";
+
+    if (
+      !confirm(`ยืนยันลบงานรหัส ${taskCode}${taskName ? `: ${taskName}` : ""}?`)
+    )
+      return;
+
+    const res = await fetch(`${API_BASE}/tasks/${encodeURIComponent(id)}`, {
       method: "DELETE",
       headers: tokenHeader(),
     });
+
+    const result = await res.json();
+
+    alert(result.message || `ลบงานรหัส ${taskCode} สำเร็จ`);
     await loadTasks();
   } catch (err) {
-    console.error("ลบงานไม่สำเร็จ:", err);
+    console.error("❌ ลบงานไม่สำเร็จ:", err);
     alert("❌ ลบงานไม่สำเร็จ");
   }
 }
+
 async function delBulk() {
   if (selectedIds.size === 0) return alert("ยังไม่ได้เลือกรายการ");
   if (!confirm(`ยืนยันลบ ${selectedIds.size} งานที่เลือก?`)) return;
@@ -522,6 +595,7 @@ function autoResize(el) {
 
 window.addEventListener("DOMContentLoaded", async () => {
   bindFilterBar();
+  await loadUserList();
   await loadTasks();
   document.querySelectorAll("textarea, textarea.remark").forEach((t) => {
     autoResize(t);

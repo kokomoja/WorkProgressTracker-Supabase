@@ -1,24 +1,27 @@
 {
   "name": "work-progress-tracker",
   "version": "1.0.0",
-  "description": "",
+  "type": "module",
+  "description": "\"# WorkProgressTracker\"\r \"# WorkProgressTracker\"\r \"# WorkProgressTracker\"",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.76.1",
     "bcryptjs": "^3.0.2",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "exceljs": "^4.4.0",
     "express": "^5.1.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mssql": "^12.0.0",
     "node-fetch": "^3.3.2",
     "pdfkit": "^0.17.2"
   },
@@ -26,5 +29,13 @@
     "eslint": "^9.38.0",
     "gitleaks": "^1.0.0",
     "husky": "^9.1.7"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kokomoja/WorkProgressTracker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kokomoja/WorkProgressTracker/issues"
+  },
+  "homepage": "https://github.com/kokomoja/WorkProgressTracker#readme"
 }

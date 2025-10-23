@@ -4,80 +4,89 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>ลืมรหัสผ่าน | PCG Work Tracker</title>
+    <link rel="icon" href="assets/favicon.ico" />
     <link rel="stylesheet" href="style.css" />
     <script src="public.config.js"></script>
   </head>
+
   <body class="auth-page">
-    <div class="auth-container">
+    <header class="header">
+      <img src="assets/logo.png" alt="PCG Logo" class="logo" />
       <h1>🔐 ลืมรหัสผ่าน</h1>
+    </header>
+
+    <div class="auth-container">
       <form id="resetForm">
         <div class="form-group">
-          <label>ชื่อผู้ใช้:</label><input id="username" required />
+          <label>ชื่อผู้ใช้:</label>
+          <input id="username" required />
         </div>
+
         <div class="form-group">
-          <label>รหัสผ่านใหม่:</label
-          ><input type="password" id="newPassword" required />
+          <label>รหัสผ่านใหม่:</label>
+          <input type="password" id="newPassword" required />
         </div>
+
         <div class="form-group">
-          <label>รหัสยืนยันการเปลี่ยนรหัสผ่าน:</label
-          ><input
+          <label>รหัสยืนยันการเปลี่ยนรหัสผ่าน:</label>
+          <input
             type="password"
             id="secret"
             placeholder="0845535000721"
             required
           />
         </div>
+
         <button type="submit">รีเซ็ตรหัสผ่าน</button>
       </form>
+
       <p><a href="login.html">กลับไปหน้าเข้าสู่ระบบ</a></p>
       <p id="resetMessage"></p>
     </div>
+
+    <footer class="footer">© 2025 PCG Terminal Co., Ltd.</footer>
 
     <script>
       document
         .getElementById("resetForm")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
+
           const body = {
             username: document.getElementById("username").value.trim(),
-            newPassword: document.getElementById("newPassword").value,
-            secret: document.getElementById("secret").value,
+            newPassword: document.getElementById("newPassword").value.trim(),
+            secret: document.getElementById("secret").value.trim(),
           };
+
           const msg = document.getElementById("resetMessage");
           msg.textContent = "";
+
           try {
             const API_BASE =
               (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
 
-            const res = await fetch("${API_BASE}/reset-password", {
+            const res = await fetch(`${API_BASE}/reset-password`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(body),
             });
+
             const data = await res.json();
+
             if (data.status === "success") {
+              msg.style.color = "#00b050";
               msg.textContent = "✅ " + data.message;
               setTimeout(() => (location.href = "login.html"), 1200);
             } else {
+              msg.style.color = "#ff3b3b";
               msg.textContent = "❌ " + data.message;
             }
-          } catch {
+          } catch (err) {
+            console.error("❌ reset error:", err);
+            msg.style.color = "#ff3b3b";
             msg.textContent = "❌ ไม่สามารถเชื่อมต่อ API";
           }
         });
-      window.addEventListener("DOMContentLoaded", () => {
-        const textareas = document.querySelectorAll(
-          "textarea, textarea.remark"
-        );
-        textareas.forEach((txt) => {
-          autoResize(txt);
-          txt.addEventListener("input", () => autoResize(txt));
-        });
-        function autoResize(el) {
-          el.style.height = "auto";
-          el.style.height = el.scrollHeight + "px";
-        }
-      });
     </script>
   </body>
 </html>

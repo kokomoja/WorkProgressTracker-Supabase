@@ -1,9 +1,10 @@
 window.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
 
-(function initAuth() {
+window.addEventListener("DOMContentLoaded", () => {
   const role = localStorage.getItem("role");
   const username = localStorage.getItem("username");
-  const displayName = localStorage.getItem("displayName") || "ไม่ระบุชื่อ";
+  const displayName =
+    localStorage.getItem("displayName") || username || "ไม่ระบุชื่อ";
 
   if (!role || !username) {
     location.href = "login.html";
@@ -16,15 +17,19 @@ window.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
   }
 
   const info = document.getElementById("userInfo");
-  if (info) info.textContent = `👷 ${displayName || username}`;
+  if (info) info.textContent = `👷 ${displayName}`;
 
+  // ปุ่มออกจากระบบ
   const logoutBtn = document.getElementById("logout");
   if (logoutBtn)
     logoutBtn.addEventListener("click", () => {
       localStorage.clear();
       location.href = "login.html";
     });
-})();
+
+  // โหลดข้อมูลงานหลังจากตั้งชื่อแล้ว
+  loadUserTasks();
+});
 
 (function () {
   const role = localStorage.getItem("role");
@@ -188,16 +193,16 @@ document.getElementById("userForm").addEventListener("submit", async (e) => {
   const token = localStorage.getItem("token");
 
   const payload = {
-    task_id: document.getElementById("taskId").value.trim(),
-    name: document.getElementById("taskName").value.trim(),
+    task_id: document.getElementById("taskId").value,
+    task_name: document.getElementById("taskName").value,
     assignee: username,
-    assignee_display: displayName,
+    assignee_display: displayName, // ✅ เพิ่มชื่อแสดง
     startDate: document.getElementById("startDate").value || null,
     endDate: document.getElementById("endDate").value || null,
     progress: parseInt(document.getElementById("progress").value || "0", 10),
     status: document.getElementById("status").value,
     remark: document.getElementById("remark").value,
-    lastUpdate: new Date().toLocaleString("th-TH"),
+    last_update: new Date().toLocaleString("th-TH"), // ✅ timestamp
   };
 
   try {
@@ -237,11 +242,6 @@ function initAutoResizeTextareas() {
     el.style.height = el.scrollHeight + "px";
   }
 }
-
-window.addEventListener("DOMContentLoaded", async () => {
-  await loadUserTasks();
-  initAutoResizeTextareas();
-});
 
 function applySortFilterSearch(list) {
   const sortValue = document.getElementById("sortSelect")?.value || "latest";

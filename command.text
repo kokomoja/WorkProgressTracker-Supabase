@@ -1,0 +1,18 @@
+git add .gitignore
+git commit -m "🧩 update .gitignore rules"
+git rm -r --cached .
+git add .
+git commit -m "🧹 apply .gitignore and clean tracked files"
+git push origin main
+
+
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = 'https://utqhbarovgprsnbsyacc.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
+
+
+SUPABASE API-KEY
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0cWhiYXJvdmdwcnNuYnN5YWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNjAwMzcsImV4cCI6MjA3NjczNjAzN30.lyLH8qfd2uZzp7fx3shvyZ2yRTaVj81T15I2xy9uQuo

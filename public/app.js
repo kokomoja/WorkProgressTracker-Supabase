@@ -4,7 +4,7 @@ let chart;
 async function loadTasksFromDB() {
   try {
     const token = localStorage.getItem("token");
-    const res = await fetch("${API_BASE}/taskstasks", {
+    const res = await fetch(`${API_BASE}/tasks`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();

@@ -69,8 +69,7 @@
           try {
             const API_BASE =
               (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
-
-            const res = await fetch("${API_BASE}/register", {
+            const res = await fetch(`${API_BASE}/register`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(body),

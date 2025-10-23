@@ -58,6 +58,11 @@
               body: JSON.stringify(body),
             });
 
+            if (!res.ok) {
+              const text = await res.text();
+              throw new Error(`Server responded ${res.status}: ${text}`);
+            }
+
             const data = await res.json();
 
             if (data.status === "success") {
@@ -81,9 +86,10 @@
               msg.textContent = "❌ " + data.message;
             }
           } catch (err) {
-            msg.style.color = "#ff3b3b";
-            msg.textContent = "❌ ไม่สามารถเชื่อมต่อ API";
             console.error("Login error:", err);
+            msg.style.color = "#ff3b3b";
+            msg.textContent =
+              "❌ ไม่สามารถเชื่อมต่อ API หรือ server ไม่ตอบกลับ";
           }
         });
     </script>
