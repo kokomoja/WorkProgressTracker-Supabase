@@ -16,81 +16,68 @@ const tokenHeader = () => ({
 });
 
 async function loadUsers(q = "") {
-  const res = await fetch(`${API_BASE}/users?q=${encodeURIComponent(q)}`, {
-    headers: tokenHeader(),
-  });
-  const users = await res.json();
-  const tbody = document.getElementById("userTbody");
-  tbody.innerHTML = "";
-  (users || []).forEach((u) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${u.username}</td>
-      <td>
-        <select data-username="${u.username}" class="roleSel">
-          <option value="user" ${
-            u.role === "user" ? "selected" : ""
-          }>user</option>
-          <option value="admin" ${
-            u.role === "admin" ? "selected" : ""
-          }>admin</option>
-        </select>
-      </td>
-      <td class="row gap">
-        <button class="btn xs ghost" data-act="saveRole">บันทึกสิทธิ์</button>
-        <button class="btn xs danger" data-act="resetPass">รีเซ็ตรหัสผ่าน</button>
-      </td>
-    `;
+  try {
+    const res = await fetch(`${API_BASE}/users?q=${encodeURIComponent(q)}`, {
+      headers: tokenHeader(),
+    });
+    const users = await res.json();
 
-    tr.querySelector('[data-act="saveRole"]').addEventListener(
-      "click",
-      async () => {
-        const roleSel = tr.querySelector(".roleSel");
-        const newRole = roleSel.value;
-        const res = await fetch(
-          `${API_BASE}/users/${encodeURIComponent(u.username)}/role`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json", ...tokenHeader() },
-            body: JSON.stringify({ role: newRole }),
-          }
-        );
-        if (res.ok) alert("✅ อัปเดตสิทธิ์สำเร็จ");
-      }
-    );
+    const tbody = document.getElementById("userTbody");
+    if (!tbody) return;
 
-    tr.querySelector('[data-act="resetPass"]').addEventListener(
-      "click",
-      async () => {
-        const newPassword = prompt("รหัสผ่านใหม่:");
-        const secret = prompt("ใส่ Secret ของระบบเพื่อยืนยัน:");
-        if (!newPassword || !secret) return;
-        const res = await fetch(`${API_BASE}/reset-password`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json", ...tokenHeader() },
-          body: JSON.stringify({ username: u.username, newPassword, secret }),
-        });
-        const data = await res.json();
-        data.status === "success"
-          ? alert("✅ รีเซ็ตสำเร็จ")
-          : alert("❌ " + (data.message || "ล้มเหลว"));
-      }
-    );
+    tbody.innerHTML = "";
 
-    tbody.appendChild(tr);
-  });
+    (users || []).forEach((u) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${u.username}</td>
+        <td>
+          <select data-username="${u.username}" class="roleSel">
+            <option value="user" ${
+              u.role === "user" ? "selected" : ""
+            }>user</option>
+            <option value="admin" ${
+              u.role === "admin" ? "selected" : ""
+            }>admin</option>
+          </select>
+        </td>
+        <td class="row gap">
+          <button class="btn xs ghost" data-act="saveRole">บันทึกสิทธิ์</button>
+          <button class="btn xs danger" data-act="resetPass">รีเซ็ตรหัสผ่าน</button>
+        </td>
+      `;
+
+      tr.querySelector('[data-act="saveRole"]').addEventListener(
+        "click",
+        async () => {
+          const roleSel = tr.querySelector(".roleSel");
+          const newRole = roleSel.value;
+          const res = await fetch(
+            `${API_BASE}/users/${encodeURIComponent(u.username)}/role`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json", ...tokenHeader() },
+              body: JSON.stringify({ role: newRole }),
+            }
+          );
+          if (res.ok) alert("✅ อัปเดตสิทธิ์สำเร็จ");
+        }
+      );
+
+      tbody.appendChild(tr);
+    });
+
+    const timeEl = document.getElementById("userUpdateTime");
+    if (timeEl) {
+      timeEl.textContent = new Date().toLocaleString("th-TH");
+    }
+  } catch (err) {
+    console.error("❌ loadUsers error:", err);
+    alert("❌ โหลดรายชื่อผู้ใช้ไม่สำเร็จ");
+  }
 }
 
-document
-  .getElementById("refreshUsers")
-  .addEventListener("click", () =>
-    loadUsers(document.getElementById("uSearch").value.trim())
-  );
-document.getElementById("uSearch").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") loadUsers(e.target.value.trim());
-});
-
-document.getElementById("sysForm").addEventListener("submit", async (e) => {
+document.getElementById("sysForm")?.addEventListener("submit", async (e) => {
   e.preventDefault();
   const body = {
     secret: document.getElementById("cfgSecret").value,
@@ -113,18 +100,99 @@ document.getElementById("sysForm").addEventListener("submit", async (e) => {
 });
 
 window.addEventListener("DOMContentLoaded", async () => {
-  await loadUsers("");
-  try {
-    const res = await fetch(`${API_BASE}/admin/settings`, {
-      headers: tokenHeader(),
+  await loadUsers();
+});
+
+document
+  .getElementById("registerForm")
+  ?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    console.log("✅ registerForm event triggered");
+    const username = document.getElementById("regUsername").value.trim();
+    const display_name = document.getElementById("regDisplay").value.trim();
+    const password = document.getElementById("regPassword").value.trim();
+    const role = document.getElementById("regRole").value;
+    const secret = document.getElementById("regSecret").value.trim();
+
+    if (!username || !password || !display_name || !secret)
+      return alert("⚠️ กรุณากรอกข้อมูลให้ครบทุกช่อง");
+
+    try {
+      const res = await fetch(`${API_BASE}/admin-setting/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username,
+          password,
+          display_name,
+          role,
+          secret,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        alert("เพิมบัญชีผู้ใช้สำเร็จ!");
+        e.target.reset();
+        await loadUsers();
+      } else {
+        alert(" เพิ่มบัญชีผู้ใช้ไม่สำเร็จ : " + (data.message || ""));
+      }
+    } catch (err) {
+      console.error("Register Error : ", err);
+      alert("เกิดข้อผิดพลายระหว่างเพิ่มบัญชีผู้ใช้งาน");
+    }
+  });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const refreshBtn = document.getElementById("refreshUsers");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", async () => {
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = "⏳ กำลังโหลด...";
+      try {
+        await loadUsers();
+        alert("✅ โหลดรายชื่อผู้ใช้งานสำเร็จ!");
+      } catch (err) {
+        console.error("❌ โหลดรายชื่อผู้ใช้ล้มเหลว:", err);
+        alert("❌ โหลดรายชื่อผู้ใช้งานไม่สำเร็จ");
+      } finally {
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = "🔄 รีเฟรช";
+      }
     });
-    if (res.ok) {
-      const cfg = await res.json();
-      if (cfg.secret) document.getElementById("cfgSecret").value = cfg.secret;
-      if (cfg.statuses)
-        document.getElementById("cfgStatuses").value = cfg.statuses.join(",");
+  }
+});
+
+document.getElementById("forgotForm")?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById("forgotUsername").value.trim();
+  const newPassword = document.getElementById("forgotPassword").value.trim();
+
+  if (!username || !newPassword) {
+    alert("⚠️ กรุณากรอกชื่อผู้ใช้และรหัสผ่านใหม่ให้ครบ");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/admin-setting/reset-password`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", ...tokenHeader() },
+      body: JSON.stringify({ username, newPassword }),
+    });
+
+    const data = await res.json();
+
+    if (data.status === "success") {
+      alert("✅ รีเซ็ตรหัสผ่านสำเร็จ!");
+      e.target.reset();
+    } else {
+      alert("❌ ไม่สามารถรีเซ็ตรหัสผ่านได้: " + (data.message || ""));
     }
   } catch (err) {
-    console.error("❌ โหลดค่าตั้งต้นล้มเหลว:", err);
+    console.error("❌ Reset password error:", err);
+    alert("เกิดข้อผิดพลาดระหว่างรีเซ็ตรหัสผ่าน");
   }
 });

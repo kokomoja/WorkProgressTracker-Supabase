@@ -5,11 +5,13 @@ dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 export function verifyToken(req, res, next) {
-  const token = req.headers["authorization"];
-  if (!token)
+  const header = req.headers["authorization"];
+  if (!header)
     return res.status(401).json({ status: "error", message: "Missing token" });
 
-  jwt.verify(token.replace("Bearer ", ""), JWT_SECRET, (err, decoded) => {
+  const token = header.replace("Bearer ", "");
+
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if (err)
       return res
         .status(403)

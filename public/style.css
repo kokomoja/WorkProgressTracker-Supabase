@@ -1,0 +1,245 @@
+/* ==============================================
+   🎨 PCG Work Tracker - Clean CSS (2025)
+   ============================================== */
+
+/* ===========================
+   🔘 Buttons
+   =========================== */
+.btn-edit,
+.btn-danger {
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  transition: background-color 0.2s ease;
+}
+
+.btn-edit {
+  background-color: #0d6efd;
+}
+.btn-edit:hover {
+  background-color: #0a58ca;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+}
+.btn-danger:hover {
+  background-color: #b02a37;
+}
+
+.btn-sm {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+/* Hover / Action Buttons */
+#refreshUsers {
+  transition: all 0.2s ease;
+}
+#refreshUsers:hover {
+  background-color: #f0f0f0;
+  transform: scale(1.05);
+}
+
+.d-flex.gap-2 button {
+  min-width: 60px;
+}
+
+/* ===========================
+   🔽 Expand/Collapse Buttons
+   =========================== */
+.toggle-detail {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0d6efd;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.toggle-detail:hover {
+  transform: scale(1.1);
+  color: #0a58ca;
+}
+
+/* ===========================
+   📋 Table (Shared Styles)
+   =========================== */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+table th,
+table td {
+  vertical-align: middle;
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #e0e0e0;
+  word-wrap: break-word;
+}
+
+table thead th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f5f7fa;
+  transition: background-color 0.2s ease;
+}
+
+/* Alternate row colors */
+table tbody tr:nth-child(odd) {
+  background-color: #fff;
+}
+table tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* ===========================
+   🧩 Collapse Rows (Details)
+   =========================== */
+.collapse-row td {
+  background-color: #f9fafb !important;
+  padding: 15px 20px;
+  border-left: 4px solid #0d6efd1a;
+  transition: all 0.3s ease;
+}
+.collapse-row p {
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+.collapse-row strong {
+  color: #222;
+}
+.collapse-row .btn {
+  font-size: 0.85rem;
+  padding: 4px 10px;
+}
+
+/* ===========================
+   🧾 Status Colors
+   =========================== */
+.table-success td:first-child {
+  border-left: 4px solid #198754;
+}
+.table-warning td:first-child {
+  border-left: 4px solid #ffc107;
+}
+.table-secondary td:first-child {
+  border-left: 4px solid #6c757d;
+}
+
+/* ===========================
+   🪶 Cards
+   =========================== */
+.card {
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+.card-header {
+  border-top-left-radius: 12px !important;
+  border-top-right-radius: 12px !important;
+  background: linear-gradient(90deg, #e9f2ff, #f8fbff);
+}
+.card-header h5 {
+  font-weight: 600;
+  color: #0d6efd;
+}
+.card-header button {
+  font-size: 0.9rem;
+}
+
+/* ===========================
+   🧭 Utilities
+   =========================== */
+.cursor-pointer {
+  cursor: pointer;
+}
+.bg-light-subtle {
+  background-color: #fafafa !important;
+}
+
+/* ===========================
+   📊 Task Tables (Admin/User)
+   =========================== */
+#taskTable,
+#userTable {
+  border-radius: 12px;
+  overflow: hidden;
+}
+#taskTable th:first-child,
+#userTable th:first-child {
+  width: 130px;
+  text-align: center;
+}
+#taskTable th:nth-child(4),
+#taskTable th:nth-child(5),
+#taskTable td:nth-child(4),
+#taskTable td:nth-child(5) {
+  text-align: center;
+}
+
+/* ===========================
+   🪟 Modal (Edit Task)
+   =========================== */
+#editTaskModal .modal-content,
+#taskModal .modal-content {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+#editTaskModal .modal-header,
+#taskModal .modal-header {
+  background: linear-gradient(90deg, #0d6efd, #0a58ca);
+  color: white;
+  border-bottom: none;
+  border-top-left-radius: 14px;
+  border-top-right-radius: 14px;
+}
+
+#editTaskModal .modal-body,
+#taskModal .modal-body {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+}
+
+#editTaskForm .form-label {
+  font-weight: 500;
+  color: #333;
+}
+
+#saveEditBtn {
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+#saveEditBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+#saveEditBtn:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
+/* ===========================
+   📱 Responsive
+   =========================== */
+@media (max-width: 768px) {
+  table th,
+  table td {
+    font-size: 0.85rem;
+    padding: 6px 8px;
+  }
+  .collapse-row td {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+}

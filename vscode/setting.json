@@ -31,7 +31,7 @@
   ],
 
   "json.schemas": [],
-
+  "css.enabledLanguages": ["html", "javascript"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
 
@@ -47,6 +47,7 @@
   "eslint.enable": true,
   "eslint.alwaysShowStatus": true,
   "eslint.format.enable": true,
+
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
@@ -67,6 +68,20 @@
     "vue"
   ],
 
+  "prettier.printWidth": 100,
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "prettier.singleQuote": false,
+  "prettier.bracketSameLine": true,
+  "prettier.htmlWhitespaceSensitivity": "ignore",
+
   "html-css-class-completion.enableEmmetSupport": true,
-  "html-css-class-completion.enable": true
+  "html-css-class-completion.enable": true,
+
+  "html.validate.scripts": false,
+  "html.validate.styles": false,
+
+  "emmet.includeLanguages": {
+    "javascript": "html"
+  }
 }
