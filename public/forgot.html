@@ -4,71 +4,79 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>ลืมรหัสผ่าน | PCG Work Tracker</title>
-    <link rel="icon" href="assets/favicon.ico" />
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
     <script src="public.config.js"></script>
   </head>
 
-  <body class="auth-page">
-    <header class="header">
-      <img src="assets/logo.png" alt="PCG Logo" class="logo" />
-      <h1>🔐 ลืมรหัสผ่าน</h1>
-    </header>
+  <body class="bg-light d-flex align-items-center" style="min-height: 100vh">
+    <main class="container">
+      <div class="card shadow p-4 mx-auto" style="max-width: 420px">
+        <div class="text-center mb-3">
+          <img src="assets/logo.png" alt="PCG Logo" width="80" />
+        </div>
+        <h4 class="text-center fw-semibold mb-4">🔐 ลืมรหัสผ่าน</h4>
 
-    <div class="auth-container">
-      <form id="resetForm">
-        <div class="form-group">
-          <label>ชื่อผู้ใช้:</label>
-          <input id="username" required />
+        <form id="resetForm" class="vstack gap-3">
+          <div>
+            <label class="form-label">ชื่อผู้ใช้</label>
+            <input id="username" class="form-control" required />
+          </div>
+          <div>
+            <label class="form-label">รหัสผ่านใหม่</label>
+            <input
+              type="password"
+              id="newPassword"
+              class="form-control"
+              required
+            />
+          </div>
+          <div>
+            <label class="form-label">รหัสยืนยัน (CONFIRM_SECRET)</label>
+            <input
+              type="password"
+              id="secret"
+              class="form-control"
+              placeholder="0845535000721"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-warning w-100">
+            รีเซ็ตรหัสผ่าน
+          </button>
+        </form>
+
+        <div class="text-center mt-3 small">
+          <a href="login.html" class="text-decoration-none"
+            >← กลับหน้าเข้าสู่ระบบ</a
+          >
         </div>
 
-        <div class="form-group">
-          <label>รหัสผ่านใหม่:</label>
-          <input type="password" id="newPassword" required />
-        </div>
+        <p id="resetMessage" class="text-center mt-3 fw-semibold"></p>
+      </div>
+    </main>
 
-        <div class="form-group">
-          <label>รหัสยืนยันการเปลี่ยนรหัสผ่าน:</label>
-          <input
-            type="password"
-            id="secret"
-            placeholder="0845535000721"
-            required
-          />
-        </div>
-
-        <button type="submit">รีเซ็ตรหัสผ่าน</button>
-      </form>
-
-      <p><a href="login.html">กลับไปหน้าเข้าสู่ระบบ</a></p>
-      <p id="resetMessage"></p>
-    </div>
-
-    <footer class="footer">© 2025 PCG Terminal Co., Ltd.</footer>
+    <footer class="text-center text-muted small py-3">
+      © 2025 PCG Terminal Co., Ltd.
+    </footer>
 
     <script>
       document
         .getElementById("resetForm")
         .addEventListener("submit", async (e) => {
           e.preventDefault();
-
           const body = {
             username: document.getElementById("username").value.trim(),
             newPassword: document.getElementById("newPassword").value.trim(),
             secret: document.getElementById("secret").value.trim(),
           };
-
           const msg = document.getElementById("resetMessage");
           msg.textContent = "";
-
           try {
             const API_BASE =
               (window.APP_CONFIG && window.APP_CONFIG.API_BASE) || "/api";
-
             const res = await fetch(
               `${API_BASE}/admin-setting/reset-password`,
               {
@@ -77,9 +85,7 @@
                 body: JSON.stringify(body),
               }
             );
-
             const data = await res.json();
-
             if (data.status === "success") {
               msg.style.color = "#00b050";
               msg.textContent = "✅ " + data.message;
@@ -88,8 +94,7 @@
               msg.style.color = "#ff3b3b";
               msg.textContent = "❌ " + data.message;
             }
-          } catch (err) {
-            console.error("❌ reset error:", err);
+          } catch {
             msg.style.color = "#ff3b3b";
             msg.textContent = "❌ ไม่สามารถเชื่อมต่อ API";
           }

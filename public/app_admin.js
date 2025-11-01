@@ -176,22 +176,26 @@ function renderTable(tasks) {
     detailRow.classList.add("collapse-row");
     detailRow.style.display = "none";
     detailRow.innerHTML = `
-      <td colspan="4" class="text-start">
-        <p><strong>วันที่เริ่มต้น:</strong> ${t.startDate || "-"}</p>
-        <p><strong>วันที่สิ้นสุด:</strong> ${t.endDate || "-"}</p>
-        <p><strong>ความคืบหน้า:</strong> ${
-          t.progress ? t.progress + "%" : "-"
-        }</p>
-        <p><strong>หมายเหตุ:</strong> ${t.remark || "-"}</p>
-        <p><strong>อัปเดตล่าสุด:</strong> ${t.lastUpdate || "-"}</p>
-        <div class="text-end mt-2">
-          <button class="btn btn-sm btn-edit me-2" data-id="${
-            t.id
-          }">✏️ แก้ไข</button>
-          <button class="btn btn-sm btn-danger" data-id="${t.id}">🗑️ ลบ</button>
-        </div>
-      </td>
-    `;
+    <td colspan="4" class="text-start">
+      <p><strong>วันที่เริ่มต้น:</strong> ${t.startDate || "-"}</p>
+      <p><strong>วันที่สิ้นสุด:</strong> ${t.endDate || "-"}</p>
+      <p><strong>ความคืบหน้า:</strong> ${
+        t.progress ? t.progress + "%" : "-"
+      }</p>
+      <p><strong>หมายเหตุ:</strong> ${t.remark || "-"}</p>
+      <p><strong>อัปเดตล่าสุด:</strong> ${t.lastUpdate || "-"}</p>
+      <div class="text-end mt-2">
+        <button class="btn btn-sm btn-outline-warning btn-edit me-2" data-id="${
+          t.id
+        }">
+          ✏️ แก้ไข
+        </button>
+        <button class="btn btn-sm btn-outline-danger" data-id="${t.id}">
+          🗑️ ลบ
+        </button>
+      </div>
+    </td>
+  `;
 
     tbody.appendChild(row);
     tbody.appendChild(detailRow);

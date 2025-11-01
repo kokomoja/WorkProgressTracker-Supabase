@@ -75,9 +75,9 @@ function appendTaskRow(task) {
   mainRow.className = "align-middle border-bottom fw-semibold cursor-pointer";
   mainRow.dataset.id = task.id;
   mainRow.innerHTML = `
-    <td style="width: 15%;">${task.task_id || "-"}</td>
-    <td style="width: 55%;">${task.task_name || "-"}</td>
-    <td class="${statusClass}" style="width: 30%; text-align: center;">
+    <td style="width: 10%;">${task.task_id || "-"}</td>
+    <td style="width: 80%;">${task.task_name || "-"}</td>
+    <td class="text-center ${statusClass}" style="white-space: nowrap;">
       ${task.status || "ยังไม่เริ่ม"}
     </td>
   `;
@@ -91,10 +91,10 @@ function appendTaskRow(task) {
         <p><strong>ผู้รับผิดชอบ:</strong> ${assignee}</p>
         <p><strong>วันที่เริ่ม:</strong> ${startDate} | <strong>สิ้นสุด:</strong> ${endDate}</p>
         <p><strong>ความคืบหน้า:</strong> ${progress}%</p>
-        <p><strong>หมายเหตุ:</strong> ${remark}</p>
+        <p><strong>บันทึกความก้าวหน้า:</strong> ${remark}</p>
         <p><strong>อัปเดตล่าสุด:</strong> ${lastUpdate}</p>
         <div class="text-end mt-2">
-          <button class="btn btn-sm btn-outline-warning btn-edit">✏️ แก้ไข</button>
+          <button class="btn btn-sm btn-outline-warning btn-edit">✏️ อัพเดท</button>
           <button class="btn btn-sm btn-outline-danger btn-del">🗑️ ลบ</button>
         </div>
       </div>
@@ -321,7 +321,7 @@ function updateTaskRow(id, newData) {
     <p><strong>ผู้รับผิดชอบ:</strong> ${assignee}</p>
     <p><strong>วันที่เริ่ม:</strong> ${startDate} | <strong>สิ้นสุด:</strong> ${endDate}</p>
     <p><strong>ความคืบหน้า:</strong> ${progress}%</p>
-    <p><strong>หมายเหตุ:</strong> ${remark}</p>
+    <p><strong>บันทึกความก้าวหน้า:</strong> ${remark}</p>
     <p><strong>อัปเดตล่าสุด:</strong> ${lastUpdate}</p>
     <div class="text-end mt-2">
       <button class="btn btn-sm btn-outline-warning btn-edit">✏️ แก้ไข</button>

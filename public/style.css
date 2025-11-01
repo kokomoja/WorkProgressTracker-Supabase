@@ -229,6 +229,14 @@ table tbody tr:nth-child(even) {
   transform: scale(1.03);
 }
 
+#togglePassword i {
+  color: #000 !important; /* สีดำเข้มตัดขาว */
+  font-size: 1.4rem !important; /* ขยายขนาด */
+}
+#togglePassword i:hover {
+  color: #0a58ca; /* สีเข้มขึ้นเมื่อ hover */
+}
+
 /* ===========================
    📱 Responsive
    =========================== */
